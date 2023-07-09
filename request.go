@@ -1,7 +1,7 @@
 package linkcxo
 
 import (
-	"strconv"
+	"errors"
 
 	"github.com/labstack/echo/v4"
 )
@@ -26,7 +26,10 @@ func (ru RequestUtils) SetCredential(c echo.Context, userCred UserCredential) {
 }
 
 // GetUserID -
-func (ru RequestUtils) GetUserID(c echo.Context) (int64, error) {
+func (ru RequestUtils) GetUserID(c echo.Context) (string, error) {
 	userCred := ru.GetCredential(c)
-	return strconv.ParseInt(userCred.UserID, 10, 0)
+	if userCred.UserID != "" {
+		return userCred.UserID, nil
+	}
+	return "", errors.New("access forbidden")
 }
