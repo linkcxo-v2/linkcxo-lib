@@ -9,22 +9,13 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-type Token struct {
-	AccessToken      string `json:"access_token"`
-	ExpiresIn        int    `json:"expires_in"`
-	RefreshExpiresIn int    `json:"refresh_expires_in"`
-	RefreshToken     string `json:"refresh_token"`
-	TokenType        string `json:"token_type"`
-	IdToken          string `json:"id_token"`
-	UserID           string `json:"userId"`
-}
-
 // UserCredential -
 type UserCredential struct {
+	IsService   bool     `json:"isService"`
 	UserID      string   `json:"userId"`
 	Roles       []string `json:"roles"`
 	Permissions []string `json:"permissions"`
-	Token       Token    `json:"token"`
+	Token       string   `json:"token"`
 }
 
 func LoggingMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
