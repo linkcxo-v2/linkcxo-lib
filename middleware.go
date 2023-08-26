@@ -62,7 +62,7 @@ func AuthMiddlewareWithConfig(config AuthConfig) echo.MiddlewareFunc {
 					userCred, err := config.AuthService.Authenticate(bearerToken)
 					if err != nil {
 						logrus.Errorln(err)
-						return c.JSON(http.StatusForbidden, NewResponseBuilder().BuildError(errors.New(err.Error()), ErrorCode.Common.StatusForbidden, http.StatusForbidden))
+						return c.JSON(http.StatusUnauthorized, NewResponseBuilder().BuildError(errors.New(err.Error()), ErrorCode.Common.StatusUnauthorized, http.StatusUnauthorized))
 					}
 					RequestUtils{}.SetCredential(c, *userCred)
 				} else {
