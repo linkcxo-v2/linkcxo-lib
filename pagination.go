@@ -38,7 +38,7 @@ type Pagination struct {
 	req        GetPaginatedRequest
 	pagination PaginationConfig
 	parser     paginationParser
-	reqImp     interface{}
+	Request    interface{}
 }
 type PaginationBuilder struct {
 	pagination PaginationConfig
@@ -63,7 +63,7 @@ func (pb *PaginationBuilder) Build() *Pagination {
 	newReq := pb.pagination.RequestFunc(req)
 	return &Pagination{
 		req:        req,
-		reqImp:     newReq,
+		Request:    newReq,
 		pagination: pb.pagination,
 		parser:     pParser,
 	}
@@ -83,7 +83,7 @@ func (p *Pagination) Metadata(meta PaginationData) *Metadata {
 		metadata.Size = req.Size
 		metadata.MinID = meta.MinID
 		metadata.MaxID = meta.MaxID
-		url := p.pagination.UrlFunc(p.reqImp)
+		url := p.pagination.UrlFunc(p.Request)
 		if len(meta.Data) >= req.Size {
 			metadata.NextResultURL = url + p.parser.buildSortAndFilterQuery(metadata, true, req)
 		}
