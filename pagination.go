@@ -9,18 +9,18 @@ import (
 )
 
 type GetPaginatedRequest struct {
-	Sort  SortRequest `json:"sort"`
-	Size  int         `json:"size"`
-	MaxID string      `json:"maxId"`
-	MinID string      `json:"minId"`
+	Sort  PaginationSortRequest `json:"sort"`
+	Size  int                   `json:"size"`
+	MaxID string                `json:"maxId"`
+	MinID string                `json:"minId"`
 }
-type SortRequest struct {
+type PaginationSortRequest struct {
 	Field    string
 	Order    int
 	Original string
 }
 
-type Metadata struct {
+type PaginationMetadata struct {
 	Size              int    `json:"size"`
 	MinID             string `json:"minId"`
 	MaxID             string `json:"maxId"`
@@ -76,9 +76,9 @@ type PaginationData struct {
 	MaxID string
 }
 
-func (p *Pagination) Metadata(meta PaginationData) *Metadata {
+func (p *Pagination) Metadata(meta PaginationData) *PaginationMetadata {
 	req := p.req
-	metadata := Metadata{}
+	metadata := PaginationMetadata{}
 	if meta.Len > 0 {
 		metadata.Size = req.Size
 		metadata.MinID = meta.MinID
@@ -100,7 +100,7 @@ func (p *Pagination) Metadata(meta PaginationData) *Metadata {
 type paginationParser struct {
 }
 
-func (pu paginationParser) buildSortAndFilterQuery(metadata Metadata, isNext bool, req GetPaginatedRequest) string {
+func (pu paginationParser) buildSortAndFilterQuery(metadata PaginationMetadata, isNext bool, req GetPaginatedRequest) string {
 	url := ""
 
 	if req.Sort.Original != "" {
@@ -123,15 +123,15 @@ func (pu paginationParser) buildSortAndFilterQuery(metadata Metadata, isNext boo
 	return url
 }
 
-func (pu paginationParser) getDefaultSort(c echo.Context) SortRequest {
+func (pu paginationParser) getDefaultSort(c echo.Context) PaginationSortRequest {
 	s := c.QueryParam("sort")
-	return SortRequest{
+	return PaginationSortRequest{
 		Field:    "_id",
 		Order:    -1,
 		Original: s,
 	}
 }
-func (pu paginationParser) parseSort(c echo.Context) SortRequest {
+func (pu paginationParser) parseSort(c echo.Context) PaginationSortRequest {
 
 	sort := pu.getDefaultSort(c)
 	s := sort.Original
