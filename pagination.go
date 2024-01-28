@@ -28,18 +28,20 @@ type Metadata struct {
 	PreviousResultURL string `json:"previousResultURL"`
 }
 
-type IPagination interface {
-	GetPaginatedRequest(req GetPaginatedRequest) interface{}
-	BuildURL(req interface{}) string
+type PaginationUrlFunc func(req interface{}) string
+type PaginationRequestFunc func(req GetPaginatedRequest) interface{}
+type PaginationConfig struct {
+	UrlFunc     PaginationUrlFunc
+	RequestFunc PaginationRequestFunc
 }
 type Pagination struct {
 	req        GetPaginatedRequest
-	pagination IPagination
+	pagination PaginationConfig
 	parser     paginationParser
 	reqImp     interface{}
 }
 type PaginationBuilder struct {
-	pagination IPagination
+	pagination PaginationConfig
 	context    echo.Context
 }
 
@@ -50,7 +52,7 @@ func (pb *PaginationBuilder) WithContext(c echo.Context) *PaginationBuilder {
 	pb.context = c
 	return pb
 }
-func (pb *PaginationBuilder) WithPagination(f IPagination) *PaginationBuilder {
+func (pb *PaginationBuilder) WithPagination(f PaginationConfig) *PaginationBuilder {
 	pb.pagination = f
 	return pb
 }
@@ -58,7 +60,7 @@ func (pb *PaginationBuilder) Build() *Pagination {
 	pParser := paginationParser{}
 	req := pParser.parseRequest(pb.context)
 	req.Sort = pParser.parseSort(pb.context)
-	newReq := pb.pagination.GetPaginatedRequest(req)
+	newReq := pb.pagination.RequestFunc(req)
 	return &Pagination{
 		req:        req,
 		reqImp:     newReq,
@@ -81,7 +83,7 @@ func (p *Pagination) Metadata(meta PaginationData) *Metadata {
 		metadata.Size = req.Size
 		metadata.MinID = meta.MinID
 		metadata.MaxID = meta.MaxID
-		url := p.pagination.BuildURL(p.reqImp)
+		url := p.pagination.UrlFunc(p.reqImp)
 		if len(meta.Data) >= req.Size {
 			metadata.NextResultURL = url + p.parser.buildSortAndFilterQuery(metadata, true, req)
 		}
