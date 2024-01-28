@@ -71,7 +71,7 @@ func (pb *PaginationBuilder) Build() *Pagination {
 }
 
 type PaginationData struct {
-	Data  []interface{}
+	Len   int
 	MinID string
 	MaxID string
 }
@@ -79,12 +79,12 @@ type PaginationData struct {
 func (p *Pagination) Metadata(meta PaginationData) *Metadata {
 	req := p.req
 	metadata := Metadata{}
-	if len(meta.Data) > 0 {
+	if meta.Len > 0 {
 		metadata.Size = req.Size
 		metadata.MinID = meta.MinID
 		metadata.MaxID = meta.MaxID
 		url := p.pagination.UrlFunc(p.Request)
-		if len(meta.Data) >= req.Size {
+		if meta.Len >= req.Size {
 			metadata.NextResultURL = url + p.parser.buildSortAndFilterQuery(metadata, true, req)
 		}
 		if req.MaxID != "" {
