@@ -29,7 +29,7 @@ type Metadata struct {
 }
 
 type PaginationUrlFunc func(req interface{}) string
-type PaginationRequestFunc func(req GetPaginatedRequest) interface{}
+type PaginationRequestFunc func(c echo.Context, req GetPaginatedRequest) interface{}
 type PaginationConfig struct {
 	UrlFunc     PaginationUrlFunc
 	RequestFunc PaginationRequestFunc
@@ -60,7 +60,7 @@ func (pb *PaginationBuilder) Build() *Pagination {
 	pParser := paginationParser{}
 	req := pParser.parseRequest(pb.context)
 	req.Sort = pParser.parseSort(pb.context)
-	newReq := pb.pagination.RequestFunc(req)
+	newReq := pb.pagination.RequestFunc(pb.context, req)
 	return &Pagination{
 		req:        req,
 		Request:    newReq,
