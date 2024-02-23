@@ -135,6 +135,9 @@ func (pu paginationParser) parseSort(c echo.Context) PaginationSortRequest {
 
 	sort := pu.getDefaultSort(c)
 	s := sort.Original
+	if strings.TrimSpace(s) == "" {
+		return sort
+	}
 	if strings.HasPrefix(s, "-") {
 		if s[1:] != "" {
 			sort.Field = s[1:]
