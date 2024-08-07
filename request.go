@@ -16,8 +16,13 @@ type RequestUtils struct {
 }
 
 // GetCredential -
-func (ru RequestUtils) GetCredential(c echo.Context) UserCredential {
-	return c.Get(ContentCredKey).(UserCredential)
+func (ru RequestUtils) GetCredential(c echo.Context) *UserCredential {
+	var cred = c.Get(ContentCredKey)
+	if cred == nil {
+		return nil
+	}
+	uc := cred.(UserCredential)
+	return &uc
 }
 
 // SetCredential -
@@ -28,7 +33,7 @@ func (ru RequestUtils) SetCredential(c echo.Context, userCred UserCredential) {
 // GetUserID -
 func (ru RequestUtils) GetUserID(c echo.Context) (string, error) {
 	userCred := ru.GetCredential(c)
-	if userCred.UserID != "" {
+	if userCred != nil && userCred.UserID != "" {
 		return userCred.UserID, nil
 	}
 	return "", errors.New("access forbidden")
