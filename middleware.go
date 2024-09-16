@@ -11,11 +11,12 @@ import (
 
 // UserCredential -
 type UserCredential struct {
-	IsService   bool     `json:"isService"`
-	UserID      string   `json:"userId"`
-	Roles       []string `json:"roles"`
-	Permissions []string `json:"permissions"`
-	Token       string   `json:"token"`
+	IsService       bool      `json:"isService"`
+	AllowedServices *[]string `json:"allowedServices"`
+	UserID          string    `json:"userId"`
+	Roles           []string  `json:"roles"`
+	Permissions     []string  `json:"permissions"`
+	Token           string    `json:"token"`
 }
 
 func LoggingMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
