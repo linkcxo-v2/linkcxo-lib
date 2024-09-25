@@ -37,7 +37,7 @@ type PaginationConfig struct {
 type Pagination struct {
 	req        GetPaginatedRequest
 	pagination PaginationConfig
-	parser     paginationParser
+	parser     PaginationParser
 	Request    interface{}
 }
 type PaginationBuilder struct {
@@ -57,9 +57,9 @@ func (pb *PaginationBuilder) WithPagination(f PaginationConfig) *PaginationBuild
 	return pb
 }
 func (pb *PaginationBuilder) Build() *Pagination {
-	pParser := paginationParser{}
-	req := pParser.parseRequest(pb.context)
-	req.Sort = pParser.parseSort(pb.context)
+	pParser := PaginationParser{}
+	req := pParser.ParseRequest(pb.context)
+	req.Sort = pParser.ParseSort(pb.context)
 	newReq := pb.pagination.RequestFunc(pb.context, req)
 	return &Pagination{
 		req:        req,
@@ -85,10 +85,10 @@ func (p *Pagination) Metadata(meta PaginationData) *PaginationMetadata {
 		metadata.MaxID = meta.MaxID
 		url := p.pagination.UrlFunc(p.Request)
 		if meta.Len >= req.Size {
-			metadata.NextResultURL = url + p.parser.buildSortAndFilterQuery(metadata, true, req)
+			metadata.NextResultURL = url + p.parser.BuildSortAndFilterQuery(metadata, true, req)
 		}
 		if req.MaxID != "" {
-			metadata.PreviousResultURL = url + p.parser.buildSortAndFilterQuery(metadata, false, req)
+			metadata.PreviousResultURL = url + p.parser.BuildSortAndFilterQuery(metadata, false, req)
 		}
 
 	} else {
@@ -97,10 +97,11 @@ func (p *Pagination) Metadata(meta PaginationData) *PaginationMetadata {
 	return &metadata
 }
 
-type paginationParser struct {
+type PaginationParser struct {
 }
 
-func (pu paginationParser) buildSortAndFilterQuery(metadata PaginationMetadata, isNext bool, req GetPaginatedRequest) string {
+func (pu PaginationParser) BuildSortAndFilterQuery(metadata PaginationMetadata, isNext bool,
+	req GetPaginatedRequest) string {
 	url := ""
 
 	if req.Sort.Original != "" {
@@ -123,7 +124,7 @@ func (pu paginationParser) buildSortAndFilterQuery(metadata PaginationMetadata, 
 	return url
 }
 
-func (pu paginationParser) getDefaultSort(c echo.Context) PaginationSortRequest {
+func (pu PaginationParser) getDefaultSort(c echo.Context) PaginationSortRequest {
 	s := c.QueryParam("sort")
 	return PaginationSortRequest{
 		Field:    "_id",
@@ -131,7 +132,7 @@ func (pu paginationParser) getDefaultSort(c echo.Context) PaginationSortRequest 
 		Original: s,
 	}
 }
-func (pu paginationParser) parseSort(c echo.Context) PaginationSortRequest {
+func (pu PaginationParser) ParseSort(c echo.Context) PaginationSortRequest {
 
 	sort := pu.getDefaultSort(c)
 	s := sort.Original
@@ -148,7 +149,7 @@ func (pu paginationParser) parseSort(c echo.Context) PaginationSortRequest {
 	}
 	return sort
 }
-func (pu paginationParser) parseRequest(c echo.Context) GetPaginatedRequest {
+func (pu PaginationParser) ParseRequest(c echo.Context) GetPaginatedRequest {
 	r := GetPaginatedRequest{}
 	var err error
 	r.MinID = c.QueryParam("minId")
