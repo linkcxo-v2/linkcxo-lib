@@ -84,7 +84,7 @@ func (p *Pagination) Metadata(meta PaginationData) *PaginationMetadata {
 		metadata.MinID = meta.MinID
 		metadata.MaxID = meta.MaxID
 		url := p.pagination.UrlFunc(p.Request)
-		if meta.Len >= req.Size {
+		if meta.Len > 0 {
 			metadata.NextResultURL = url + p.parser.BuildSortAndFilterQuery(metadata, true, req)
 		}
 		if req.MaxID != "" {
