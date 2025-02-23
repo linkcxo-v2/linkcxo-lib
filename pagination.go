@@ -160,8 +160,8 @@ func (pu PaginationParser) ParseRequest(c echo.Context) GetPaginatedRequest {
 		if err != nil {
 			r.Size = 10
 		}
-		if r.Size > 20 {
-			r.Size = 20
+		if r.Size > 1000 {
+			r.Size = 1000
 		}
 	} else {
 		r.Size = 10
